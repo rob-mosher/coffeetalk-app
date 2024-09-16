@@ -1,0 +1,12 @@
+# App related
+data/
+
+# Python-related
+__pycache__/
+
+# Environment-related
+venv/
+.env
+
+# OS-related
+.DS_Store
