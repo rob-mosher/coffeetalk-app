@@ -26,8 +26,8 @@ def main():
     print("Generating training data...")
     run_script('generate_training_data.py', target_repo_path)
 
-    # print("Training model...")
-    # run_script('train.py', target_repo_path)
+    print("Training model...")
+    run_script('train_model.py', target_repo_path)
 
     print("Data generation and model training completed successfully.")
 
