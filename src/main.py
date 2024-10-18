@@ -1,89 +1,34 @@
 import os
-import json
-import languages.javascript as javascript
-import languages.typescript as typescript
-import languages.python as python
-import languages.go as go
-from dotenv import load_dotenv
-
-load_dotenv()
-
-LANGUAGE_MODULES = {
-    '.js': javascript,
-    '.jsx': javascript,
-    '.ts': typescript,
-    '.tsx': typescript,
-    '.py': python,
-    '.go': go,
-}
-
-IGNORE_DIRS = {'node_modules', '.git', '__pycache__'}
+import subprocess
 
 
-def extract_code_snippets(file_path):
-    _, file_extension = os.path.splitext(file_path)
-
-    # Read file content
-    try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            content = file.read()
-
-        language_module = LANGUAGE_MODULES.get(file_extension)
-        if language_module:
-            snippets = language_module.extract_code_snippets(content)
-            return snippets
-        else:
-            return []
-    except Exception as e:
-        print(f"Error reading {file_path}: {e}")
-        return []
+def run_script(script_name, target_repo_path):
+    env = os.environ.copy()
+    env['TARGET_REPO_PATH'] = target_repo_path
+    script_path = os.path.join(os.path.dirname(__file__), script_name)
+    result = subprocess.run(['python', script_path], env=env, check=True)
+    if result.returncode != 0:
+        raise Exception(f"Error running {script_name}")
 
 
-def get_code_snippets_from_repo(target_repo_path):
-    snippets = []
-    for root, dirs, files in os.walk(target_repo_path):
-        # Modify dirs in-place to skip ignored directories
-        dirs[:] = [d for d in dirs if d not in IGNORE_DIRS]
+def main():
+    target_repo_path = os.getenv('TARGET_REPO_PATH')
 
-        for file in files:
-            file_extension = os.path.splitext(file)[1]
-            if file_extension in LANGUAGE_MODULES:
-                file_path = os.path.join(root, file)
-                file_snippets = extract_code_snippets(file_path)
-                snippets.extend(file_snippets)
-    return snippets
+    if not target_repo_path:
+        print("TARGET_REPO_PATH environment variable not found.")
+        target_repo_path = input(
+            "Please enter the absolute or relative path to the target repository: ")
 
+    if not os.path.exists(target_repo_path):
+        print(f"Error: The specified repository path '{target_repo_path}' does not exist.")
+        return
 
-def create_training_data(snippets):
-    training_data = []
-    for snippet in snippets:
-        prompt = f"Explain the following code snippet:\n\n{
-            snippet}\n\nExplanation:"
-        completion = " "  # Placeholder for the explanation, determined later
-        training_data.append({"prompt": prompt, "completion": completion})
-    return training_data
+    run_script('generate_data.py', target_repo_path)
 
+    # run_script('train.py', target_repo_path)
 
-def save_training_data_to_json(training_data, output_file):
-    with open(output_file, 'w', encoding='utf-8') as outfile:
-        json.dump(training_data, outfile, indent=2)
+    print("Data generation and model training completed successfully.")
 
 
 if __name__ == "__main__":
-    target_repo_path = os.getenv('TARGET_REPO_PATH')
-    if not target_repo_path or not os.path.exists(target_repo_path):
-        print(f"Error: The specified repository path '{
-              target_repo_path}' does not exist or is not set.")
-        exit(1)
-
-    output_file = os.path.join('data', 'training_data.json')
-
-    os.makedirs(os.path.dirname(output_file), exist_ok=True)
-
-    snippets = get_code_snippets_from_repo(target_repo_path)
-    print(f"Extracted {len(snippets)} code snippets.")
-
-    training_data = create_training_data(snippets)
-
-    save_training_data_to_json(training_data, output_file)
-    print(f"Training data saved to {output_file}")
+    main()
