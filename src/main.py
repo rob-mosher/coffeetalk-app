@@ -23,8 +23,10 @@ def main():
         print(f"Error: The specified repository path '{target_repo_path}' does not exist.")
         return
 
-    run_script('generate_data.py', target_repo_path)
+    print("Generating training data...")
+    run_script('generate_training_data.py', target_repo_path)
 
+    # print("Training model...")
     # run_script('train.py', target_repo_path)
 
     print("Data generation and model training completed successfully.")
