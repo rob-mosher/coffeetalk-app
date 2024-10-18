@@ -1,1 +1,5 @@
+accelerate
+datasets
 python-dotenv
+sentencepiece
+transformers
