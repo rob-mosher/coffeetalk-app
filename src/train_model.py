@@ -2,55 +2,65 @@ import os
 import torch
 from datasets import load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments, DataCollatorForLanguageModeling
+from hardware_profiles import profiles
+
+
+def setup_environment(profile):
+    for key, value in profile.env_vars.items():
+        os.environ[key] = value
+    os.environ['TOKENIZERS_PARALLELISM'] = 'false'
+    torch.set_num_threads(1)
+    torch.set_num_interop_threads(1)
 
 
 def load_dataset_from_json(json_path):
     data_files = {"train": json_path}
-    dataset = load_dataset('json', data_files=data_files)
-    return dataset
+    return load_dataset('json', data_files=data_files)
 
 
 def tokenize_function(examples, tokenizer, max_length):
     inputs = tokenizer(examples['prompt'], truncation=True, max_length=max_length)
-    with tokenizer.as_target_tokenizer():
-        labels = tokenizer(examples['completion'], truncation=True, max_length=max_length)
+    labels = tokenizer(examples['completion'], truncation=True, max_length=max_length)
     inputs["labels"] = labels["input_ids"]
     return inputs
 
 
-def fine_tune_model(dataset, model_name, output_dir, num_train_epochs=3):
+def get_model_and_tokenizer(model_name):
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     tokenizer.pad_token = tokenizer.eos_token
+    model = AutoModelForCausalLM.from_pretrained(model_name)
+    return model, tokenizer
 
-    model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16)
 
-    max_length = 128
-
-    tokenized_datasets = dataset.map(
+def prepare_dataset(dataset, tokenizer, max_length):
+    return dataset.map(
         lambda examples: tokenize_function(examples, tokenizer, max_length),
         batched=True,
         remove_columns=dataset["train"].column_names
     )
 
-    training_args = TrainingArguments(
+
+def get_training_args(output_dir, profile):
+    return TrainingArguments(
         output_dir=output_dir,
-        evaluation_strategy="no",
-        per_device_train_batch_size=1,
-        gradient_accumulation_steps=16,
-        num_train_epochs=num_train_epochs,
-        save_steps=500,
-        save_total_limit=2,
+        num_train_epochs=profile.num_train_epochs,
+        per_device_train_batch_size=profile.per_device_train_batch_size,
+        gradient_accumulation_steps=profile.gradient_accumulation_steps,
+        learning_rate=profile.learning_rate,
+        weight_decay=profile.weight_decay,
+        fp16=profile.fp16,
         logging_dir='./logs',
         logging_steps=10,
-        learning_rate=1e-4,
-        warmup_steps=50,
-        fp16=False,
-        optim="adamw_torch",
-        max_grad_norm=0.5,
-        weight_decay=0.01,
-        dataloader_num_workers=0,
+        use_cpu=profile.no_cuda,
+        use_mps_device=profile.use_mps_device,
     )
 
+
+def fine_tune_model(dataset, model_name, output_dir, hardware_profile):
+    model, tokenizer = get_model_and_tokenizer(model_name)
+    tokenized_datasets = prepare_dataset(dataset, tokenizer, hardware_profile.max_length)
+
+    training_args = get_training_args(output_dir, hardware_profile)
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
     trainer = Trainer(
@@ -65,20 +75,24 @@ def fine_tune_model(dataset, model_name, output_dir, num_train_epochs=3):
 
 
 def main():
+    hardware_profile_name = os.getenv('HARDWARE_PROFILE', 'apple_silicon')
+    hardware_profile = profiles.get(hardware_profile_name)
+    if not hardware_profile:
+        print(f"Invalid hardware profile: {hardware_profile_name}. Using default (apple_silicon).")
+        hardware_profile = profiles['apple_silicon']
+
+    print(f"Using hardware profile: {hardware_profile_name}")
+
+    setup_environment(hardware_profile)
+
     json_path = os.path.join('data', 'training_data.json')
     dataset = load_dataset_from_json(json_path)
 
-    # Use environment variable for model name, with fallback
-    model_name = os.getenv('TRAINING_MODEL')
-    if model_name:
-        print(f"Using specified model: {model_name}")
-    else:
-        model_name = 'distilgpt2'
-        print(f"TRAINING_MODEL not set. Falling back to default model: {model_name}")
+    model_name = os.getenv('TRAINING_MODEL', 'distilgpt2')
+    print(f"Using model: {model_name}")
 
     output_dir = "./results"
-
-    fine_tune_model(dataset, model_name, output_dir)
+    fine_tune_model(dataset, model_name, output_dir, hardware_profile)
 
 
 if __name__ == "__main__":
