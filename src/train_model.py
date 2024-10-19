@@ -1,7 +1,13 @@
 import os
 import torch
 from datasets import load_dataset
-from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments, DataCollatorForLanguageModeling
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    DataCollatorForLanguageModeling,
+    Trainer,
+    TrainingArguments
+)
 from hardware_profiles import profiles
 
 
