@@ -13,7 +13,7 @@ class HardwareProfile:
     fp16: bool
     env_vars: Dict[str, str] = field(default_factory=dict)
     use_mps_device: bool = False
-    no_cuda: bool = True
+    use_cpu: bool = True
 
 
 apple_silicon = HardwareProfile(
@@ -31,7 +31,7 @@ apple_silicon = HardwareProfile(
         'PYTORCH_MPS_ENABLE': '0',
     },
     use_mps_device=False,
-    no_cuda=True
+    use_cpu=True
 )
 
 # TODO: test this
@@ -45,7 +45,7 @@ cuda_gpu = HardwareProfile(
     fp16=True,
     env_vars={},
     use_mps_device=False,
-    no_cuda=False
+    use_cpu=False
 )
 
 # TODO: test this
@@ -61,7 +61,7 @@ cpu = HardwareProfile(
         'CUDA_VISIBLE_DEVICES': '',
     },
     use_mps_device=False,
-    no_cuda=True
+    use_cpu=True
 )
 
 profiles = {

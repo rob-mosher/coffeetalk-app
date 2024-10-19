@@ -51,7 +51,7 @@ def get_training_args(output_dir, profile):
         fp16=profile.fp16,
         logging_dir='./logs',
         logging_steps=10,
-        use_cpu=profile.no_cuda,
+        use_cpu=profile.use_cpu,
         use_mps_device=profile.use_mps_device,
     )
 
