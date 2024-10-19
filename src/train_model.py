@@ -74,12 +74,8 @@ def fine_tune_model(dataset, model_name, output_dir, hardware_profile):
     trainer.save_model(output_dir)
 
 
-def main():
-    hardware_profile_name = os.getenv('HARDWARE_PROFILE', 'apple_silicon')
-    hardware_profile = profiles.get(hardware_profile_name)
-    if not hardware_profile:
-        print(f"Invalid hardware profile: {hardware_profile_name}. Using default (apple_silicon).")
-        hardware_profile = profiles['apple_silicon']
+def main(target_repo_path: str, hardware_profile_name: str):
+    hardware_profile = profiles[hardware_profile_name]
 
     print(f"Using hardware profile: {hardware_profile_name}")
 
@@ -91,9 +87,7 @@ def main():
     model_name = os.getenv('TRAINING_MODEL', 'distilgpt2')
     print(f"Using model: {model_name}")
 
-    output_dir = "./results"
+    output_dir = os.path.join(target_repo_path, "results")
     fine_tune_model(dataset, model_name, output_dir, hardware_profile)
 
-
-if __name__ == "__main__":
-    main()
+    print("Model training completed successfully.")

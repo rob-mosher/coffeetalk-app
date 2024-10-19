@@ -1,35 +1,49 @@
 import os
-import subprocess
+from generate_training_data import main as generate_training_data
+from train_model import main as train_model
 
 
-def run_script(script_name, target_repo_path):
-    env = os.environ.copy()
-    env['TARGET_REPO_PATH'] = target_repo_path
-    script_path = os.path.join(os.path.dirname(__file__), script_name)
-    result = subprocess.run(['python', script_path], env=env, check=True)
-    if result.returncode != 0:
-        raise Exception(f"Error running {script_name}")
+def determine_hardware_profile():
+    from hardware_profiles import profiles
+    hardware_profile_name = os.getenv('HARDWARE_PROFILE', 'apple_silicon')
+    if hardware_profile_name not in profiles:
+        print(f"Invalid hardware profile: {hardware_profile_name}. Using default (apple_silicon).")
+        hardware_profile_name = 'apple_silicon'
+    print(f"Using hardware profile: {hardware_profile_name}")
+    return hardware_profile_name
 
 
-def main():
+def determine_target_repo_path():
     target_repo_path = os.getenv('TARGET_REPO_PATH')
-
     if not target_repo_path:
         print("TARGET_REPO_PATH environment variable not found.")
         target_repo_path = input(
             "Please enter the absolute or relative path to the target repository: ")
 
     if not os.path.exists(target_repo_path):
-        print(f"Error: The specified repository path '{target_repo_path}' does not exist.")
-        return
+        raise ValueError(f"Error: The specified repository path '{
+                         target_repo_path}' does not exist.")
 
-    print("Generating training data...")
-    run_script('generate_training_data.py', target_repo_path)
+    print(f"Using target repository: {target_repo_path}")
+    return target_repo_path
 
-    print("Training model...")
-    run_script('train_model.py', target_repo_path)
 
-    print("Data generation and model training completed successfully.")
+def main():
+    try:
+        target_repo_path = determine_target_repo_path()
+        hardware_profile = determine_hardware_profile()
+
+        print("Generating training data...")
+        generate_training_data(target_repo_path)
+
+        print("Training model...")
+        train_model(target_repo_path, hardware_profile)
+
+        print("All tasks completed successfully.")
+    except ValueError as e:
+        print(str(e))
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
 
 
 if __name__ == "__main__":

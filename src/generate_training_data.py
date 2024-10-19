@@ -69,21 +69,17 @@ def save_training_data_to_json(training_data, output_file):
         json.dump(training_data, outfile, indent=2)
 
 
-if __name__ == "__main__":
-    target_repo_path = os.getenv('TARGET_REPO_PATH')
-    if not target_repo_path or not os.path.exists(target_repo_path):
-        print(f"Error: The specified repository path '{
-              target_repo_path}' does not exist or is not set.")
-        exit(1)
+def main(target_repo_path: str):
+    snippets = get_code_snippets_from_repo(target_repo_path)
+    print(f"Extracted {len(snippets)} code snippets.")
+
+    training_data = create_training_data(snippets)
 
     output_file = os.path.join('data', 'training_data.json')
 
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
-    snippets = get_code_snippets_from_repo(target_repo_path)
-    print(f"Extracted {len(snippets)} code snippets.")
-
-    training_data = create_training_data(snippets)
+    print("Generation of training data completed successfully.")
 
     save_training_data_to_json(training_data, output_file)
     print(f"Training data saved to {output_file}")
