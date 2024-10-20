@@ -73,8 +73,6 @@ def fine_tune_model(dataset, model_name, output_dir, hardware_profile):
 
 
 def main(target_repo_path: str, hardware_profile: HardwareProfile):
-    print(f"Using hardware profile: {hardware_profile.__class__.__name__}")
-
     json_path = os.path.join('data', 'training_data.json')
     dataset = load_dataset_from_json(json_path)
 
