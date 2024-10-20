@@ -14,6 +14,9 @@ class HardwareProfile:
     env_vars: Dict[str, str] = field(default_factory=dict)
     use_mps_device: bool = False
     use_cpu: bool = True
+    tokenizers_parallelism: bool = False
+    torch_num_interop_threads: int = 1
+    torch_num_threads: int = 1
 
 
 apple_silicon = HardwareProfile(
@@ -31,7 +34,9 @@ apple_silicon = HardwareProfile(
         'PYTORCH_MPS_ENABLE': '0',
     },
     use_mps_device=False,
-    use_cpu=True
+    use_cpu=True,
+    torch_num_threads=1,
+    torch_num_interop_threads=1
 )
 
 # TODO: test this
@@ -45,7 +50,9 @@ cuda_gpu = HardwareProfile(
     fp16=True,
     env_vars={},
     use_mps_device=False,
-    use_cpu=False
+    use_cpu=False,
+    torch_num_threads=1,
+    torch_num_interop_threads=1
 )
 
 # TODO: test this
@@ -61,7 +68,9 @@ cpu = HardwareProfile(
         'CUDA_VISIBLE_DEVICES': '',
     },
     use_mps_device=False,
-    use_cpu=True
+    use_cpu=True,
+    torch_num_threads=1,
+    torch_num_interop_threads=1
 )
 
 profiles = {

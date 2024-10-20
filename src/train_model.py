@@ -8,15 +8,7 @@ from transformers import (
     Trainer,
     TrainingArguments
 )
-from hardware_profiles import profiles
-
-
-def setup_environment(profile):
-    for key, value in profile.env_vars.items():
-        os.environ[key] = value
-    os.environ['TOKENIZERS_PARALLELISM'] = 'false'
-    torch.set_num_threads(1)
-    torch.set_num_interop_threads(1)
+from hardware_profiles import HardwareProfile
 
 
 def load_dataset_from_json(json_path):
@@ -80,12 +72,8 @@ def fine_tune_model(dataset, model_name, output_dir, hardware_profile):
     trainer.save_model(output_dir)
 
 
-def main(target_repo_path: str, hardware_profile_name: str):
-    hardware_profile = profiles[hardware_profile_name]
-
-    print(f"Using hardware profile: {hardware_profile_name}")
-
-    setup_environment(hardware_profile)
+def main(target_repo_path: str, hardware_profile: HardwareProfile):
+    print(f"Using hardware profile: {hardware_profile.__class__.__name__}")
 
     json_path = os.path.join('data', 'training_data.json')
     dataset = load_dataset_from_json(json_path)

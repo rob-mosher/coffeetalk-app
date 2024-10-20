@@ -1,4 +1,5 @@
 import os
+import torch
 from hardware_profiles import profiles
 
 
@@ -7,8 +8,10 @@ def determine_hardware_profile():
     if hardware_profile_name not in profiles:
         print(f"Invalid hardware profile: {hardware_profile_name}. Using default (apple_silicon).")
         hardware_profile_name = 'apple_silicon'
+
+    hardware_profile = profiles[hardware_profile_name]
     print(f"Using hardware profile: {hardware_profile_name}")
-    return hardware_profile_name
+    return hardware_profile
 
 
 def determine_target_repo_path():
@@ -24,3 +27,11 @@ def determine_target_repo_path():
 
     print(f"Using target repository: {target_repo_path}")
     return target_repo_path
+
+
+def setup_hardware_environment(hardware_profile):
+    os.environ.update(hardware_profile.env_vars)
+    os.environ['TOKENIZERS_PARALLELISM'] = str(hardware_profile.tokenizers_parallelism).lower()
+
+    torch.set_num_threads(hardware_profile.torch_num_threads)
+    torch.set_num_interop_threads(hardware_profile.torch_num_interop_threads)
