@@ -2,16 +2,16 @@ import os
 from generate_training_data import main as generate_training_data
 from train_model import main as train_model
 from utils import (
-    determine_hardware_profile,
-    determine_target_repo_path,
+    get_hardware_profile,
+    get_target_repo_path,
     setup_hardware_environment
 )
 
 
 def main():
     try:
-        target_repo_path = determine_target_repo_path()
-        hardware_profile = determine_hardware_profile()
+        target_repo_path = get_target_repo_path()
+        hardware_profile = get_hardware_profile()
 
         print("Configuring environment variables for hardware profile...")
         setup_hardware_environment(hardware_profile)

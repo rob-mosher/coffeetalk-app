@@ -3,7 +3,7 @@ import torch
 from hardware_profiles import profiles
 
 
-def determine_hardware_profile():
+def get_hardware_profile():
     hardware_profile_name = os.getenv('HARDWARE_PROFILE', 'apple_silicon')
     if hardware_profile_name not in profiles:
         print(f"Invalid hardware profile: {hardware_profile_name}. Using default (apple_silicon).")
@@ -14,7 +14,7 @@ def determine_hardware_profile():
     return hardware_profile
 
 
-def determine_target_repo_path():
+def get_target_repo_path():
     target_repo_path = os.getenv('TARGET_REPO_PATH')
     if not target_repo_path:
         print("TARGET_REPO_PATH environment variable not found.")
