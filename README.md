@@ -33,6 +33,33 @@ CoffeeTalk can be used by developers to enhance code understanding, automate cod
    deactivate
    ```
 
+
+## Process Diagram
+
+```mermaid
+graph TD
+    Start[Target Code / Repository] --> CoffeeTalk
+
+    subgraph CoffeeTalk["CoffeeTalk ☕"]
+        LD[Language Detection] --> CSE
+
+        PTM_1[Pre-trained Model] --> TDG
+        CSE[Code Snippet Extraction] --> TDG
+        HP_1[Hardware Profile] --> TDG
+
+        TDG[Training Data Generation] -->|Inference| TD
+
+        PTM_2[Pre-trained Model] --> MFT
+        TD[Training Data] --> MFT
+        HP_2[Hardware Profile] --> MFT
+
+        MFT[Model Fine-tuning] -->|Training| FTM
+    end
+
+    FTM[Fine-tuned Model] --> End[Inference by User/AI]
+
+```
+
 ## Configuration
 
 ### Hardware Profiles
