@@ -43,21 +43,20 @@ graph TD
     subgraph CoffeeTalk["CoffeeTalk ☕"]
         LD[Language Detection] --> CSE
 
-        PTM_1[Pre-trained Model] --> TDG
-        CSE[Code Snippet Extraction] --> TDG
-        HP_1[Hardware Profile] --> TDG
+        PTM_1[Pre-trained Model] --> Inference
+        CSE[Code Snippet Extraction] --> Inference
+        HP_1[Hardware Profile] --> Inference
 
-        TDG[Training Data Generation] -->|Inference| TD
+        Inference{Inference} --> TD
 
-        PTM_2[Pre-trained Model] --> MFT
-        TD[Training Data] --> MFT
-        HP_2[Hardware Profile] --> MFT
+        PTM_2[Pre-trained Model] --> Training
+        TD[Training Data] --> Training
+        HP_2[Hardware Profile] --> Training
 
-        MFT[Model Fine-tuning] -->|Training| FTM
+        Training{Training} --> FTM
     end
 
     FTM[Fine-tuned Model] --> End[Inference by User/AI]
-
 ```
 
 ## Configuration
