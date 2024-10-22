@@ -11,6 +11,7 @@ CoffeeTalk can be used by developers to enhance code understanding, automate cod
    python -m venv venv
    ```
 2. **Activate the virtual environment:**
+   
    On Mac/Linux:
    ```
    source venv/bin/activate
@@ -20,6 +21,7 @@ CoffeeTalk can be used by developers to enhance code understanding, automate cod
    pip install -r requirements.txt
    ```
 4. **Run the script:**
+
    If `TARGET_REPO_PATH` is not set, you will be prompted for it at each invocation:
    ```
    python src/main.py
@@ -32,7 +34,6 @@ CoffeeTalk can be used by developers to enhance code understanding, automate cod
    ```
    deactivate
    ```
-
 
 ## Process Diagram
 
