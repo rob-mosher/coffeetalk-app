@@ -16,7 +16,7 @@ def main():
         hardware_profile = get_hardware_profile()
 
         setup_hardware_environment(hardware_profile)
-        generate_training_data(target_repo_path)
+        generate_training_data(target_repo_path, hardware_profile)
         train_model(target_repo_path, hardware_profile)
 
         print("All CoffeeTalk tasks completed successfully.")

@@ -13,6 +13,9 @@ def get_hardware_profile():
 
     hardware_profile = profiles[hardware_profile_name]
     print(f"Using hardware profile: {hardware_profile_name}")
+
+    hardware_profile.display_settings()
+
     return hardware_profile
 
 
@@ -42,4 +45,5 @@ def setup_hardware_environment(hardware_profile):
     torch.set_num_threads(hardware_profile.torch_num_threads)
     torch.set_num_interop_threads(hardware_profile.torch_num_interop_threads)
 
+    print(f"Using device: {hardware_profile.get_device()}")
     print("Environment variables configured successfully.")

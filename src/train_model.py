@@ -39,7 +39,7 @@ def prepare_dataset(dataset, tokenizer, max_length):
 
 
 def get_training_args(output_dir, profile):
-    return TrainingArguments(
+    training_args = TrainingArguments(
         output_dir=output_dir,
         num_train_epochs=profile.num_train_epochs,
         per_device_train_batch_size=profile.per_device_train_batch_size,
@@ -49,9 +49,18 @@ def get_training_args(output_dir, profile):
         fp16=profile.fp16,
         logging_dir='./logs',
         logging_steps=10,
-        use_cpu=profile.use_cpu,
-        use_mps_device=profile.use_mps_device,
     )
+
+    print("Training Arguments:")
+    print(f"Output Directory: {output_dir}")
+    print(f"Number of Train Epochs: {profile.num_train_epochs}")
+    print(f"Per Device Train Batch Size: {profile.per_device_train_batch_size}")
+    print(f"Gradient Accumulation Steps: {profile.gradient_accumulation_steps}")
+    print(f"Learning Rate: {profile.learning_rate}")
+    print(f"Weight Decay: {profile.weight_decay}")
+    print(f"FP16: {profile.fp16}")
+
+    return training_args
 
 
 def fine_tune_model(dataset, model_name, output_dir, hardware_profile):

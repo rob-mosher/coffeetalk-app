@@ -5,6 +5,8 @@ import languages.typescript as typescript
 import languages.python as python
 import languages.go as go
 from dotenv import load_dotenv
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
+import torch
 
 load_dotenv()
 
@@ -54,13 +56,58 @@ def get_code_snippets_from_repo(target_repo_path):
     return snippets
 
 
-def create_training_data(snippets):
+def create_training_data(snippets, hardware_profile):
     training_data = []
+
+    # Load the model and tokenizer
+    model = GPT2LMHeadModel.from_pretrained("distilgpt2")
+    tokenizer = GPT2Tokenizer.from_pretrained("distilgpt2")
+
+    # Configure the tokenizer
+    tokenizer.pad_token = tokenizer.eos_token  # Ensure pad_token is set
+    model.config.pad_token_id = model.config.eos_token_id
+
+    print("Model Settings:")
+    print(f"Model Name: distilgpt2")
+    print(f"Pad Token ID: {model.config.pad_token_id}")
+
+    device = hardware_profile.get_device()
+    print(f"Using device: {device}")
+    model.to(device)
+
     for snippet in snippets:
-        prompt = f"Explain the following code snippet:\n\n{
-            snippet}\n\nExplanation:"
-        completion = " "  # Placeholder for the explanation, determined later
-        training_data.append({"prompt": prompt, "completion": completion})
+        prompt = f"Explain the following code snippet:\n\n{snippet}\n\nExplanation:"
+
+        # Tokenize the prompt
+        inputs = tokenizer(prompt, return_tensors="pt", padding=True,
+                           truncation=True, max_length=hardware_profile.max_length)
+        inputs = {k: v.to(device) for k, v in inputs.items()}
+
+        print(f"Input shapes: {inputs}")
+
+        # Generate completion
+        try:
+            with torch.no_grad():
+                output = model.generate(
+                    **inputs,
+                    max_length=hardware_profile.max_length,
+                    num_return_sequences=1,
+                    temperature=0.7,
+                    top_k=50,
+                    top_p=0.95,
+                    do_sample=True
+                )
+
+            completion = tokenizer.decode(output[0], skip_special_tokens=True)
+
+            # Extract only the generated explanation
+            explanation = completion.split("Explanation:")[1].strip()
+
+            training_data.append({"prompt": prompt, "completion": explanation})
+        except RuntimeError as e:
+            print(f"Error generating completion for snippet: {e}")
+            continue
+
     return training_data
 
 
@@ -69,7 +116,7 @@ def save_training_data_to_json(training_data, output_file):
         json.dump(training_data, outfile, indent=2)
 
 
-def main(target_repo_path: str):
+def main(target_repo_path: str, hardware_profile):
     print("Generating training data...")
 
     print("Extracting code snippets...")
@@ -77,7 +124,7 @@ def main(target_repo_path: str):
     print(f"Extracted {len(snippets)} code snippets.")
 
     print("Creating training data...")
-    training_data = create_training_data(snippets)
+    training_data = create_training_data(snippets, hardware_profile)
     print(f"Created {len(training_data)} training data entries.")
 
     print("Saving training data...")

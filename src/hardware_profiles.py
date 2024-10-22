@@ -4,6 +4,7 @@ This module defines hardware profiles for different computing environments.
 
 from dataclasses import dataclass, field
 from typing import Dict
+import torch
 
 
 @dataclass
@@ -33,6 +34,34 @@ class HardwareProfile:
     torch_num_interop_threads: int = 1  # Threads for interop parallelism on CPU
     torch_num_threads: int = 1  # Threads for intraop parallelism on CPU
 
+    def get_device(self):
+        """Determine the appropriate device based on the hardware profile settings."""
+        if self.use_cpu:
+            return torch.device("cpu")
+        elif self.use_mps_device and torch.backends.mps.is_available():
+            return torch.device("mps")
+        elif torch.cuda.is_available():
+            return torch.device("cuda")
+        else:
+            # Fallback to CPU if no other options are available
+            return torch.device("cpu")
+
+    def display_settings(self):
+        print("Hardware Profile Settings:")
+        print(f"Gradient Accumulation Steps: {self.gradient_accumulation_steps}")
+        print(f"Learning Rate: {self.learning_rate}")
+        print(f"Max Length: {self.max_length}")
+        print(f"Number of Train Epochs: {self.num_train_epochs}")
+        print(f"Per Device Train Batch Size: {self.per_device_train_batch_size}")
+        print(f"Weight Decay: {self.weight_decay}")
+        print(f"FP16: {self.fp16}")
+        print(f"Use CPU: {self.use_cpu}")
+        print(f"Use MPS Device: {self.use_mps_device}")
+        print(f"Environment Variables: {self.env_vars}")
+        print(f"Tokenizers Parallelism: {self.tokenizers_parallelism}")
+        print(f"PyTorch Num Interop Threads: {self.torch_num_interop_threads}")
+        print(f"PyTorch Num Threads: {self.torch_num_threads}")
+
 
 apple_silicon = HardwareProfile(
     ### Model and training hyperparameters ###
@@ -44,15 +73,15 @@ apple_silicon = HardwareProfile(
     weight_decay=0.01,
 
     ### Device and precision settings ###
-    fp16=True,
-    use_cpu=True,
-    use_mps_device=False,
+    fp16=False,
+    use_cpu=False,
+    use_mps_device=True,
 
     ### Environment variables ###
     env_vars={
         'CUDA_VISIBLE_DEVICES': '',
         'PYTORCH_ENABLE_MPS_FALLBACK': '1',
-        'PYTORCH_MPS_ENABLE': '0',
+        'PYTORCH_MPS_ENABLE': '1',
         'PYTORCH_MPS_HIGH_WATERMARK_RATIO': '0.0',
     },
 
