@@ -70,16 +70,20 @@ def save_training_data_to_json(training_data, output_file):
 
 
 def main(target_repo_path: str):
+    print("Generating training data...")
+
+    print("Extracting code snippets...")
     snippets = get_code_snippets_from_repo(target_repo_path)
     print(f"Extracted {len(snippets)} code snippets.")
 
+    print("Creating training data...")
     training_data = create_training_data(snippets)
+    print(f"Created {len(training_data)} training data entries.")
 
+    print("Saving training data...")
     output_file = os.path.join('data', 'training_data.json')
-
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
-
-    print("Generation of training data completed successfully.")
-
     save_training_data_to_json(training_data, output_file)
-    print(f"Training data saved to {output_file}")
+    print(f"Training data saved successfully to: {output_file}")
+
+    print("Generation of training data completed.")

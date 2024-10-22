@@ -10,19 +10,16 @@ from utils import (
 
 def main():
     try:
+        print("Starting CoffeeTalk...")
+
         target_repo_path = get_target_repo_path()
         hardware_profile = get_hardware_profile()
 
-        print("Configuring environment variables for hardware profile...")
         setup_hardware_environment(hardware_profile)
-
-        print("Generating training data...")
         generate_training_data(target_repo_path)
-
-        print("Training model...")
         train_model(target_repo_path, hardware_profile)
 
-        print("All tasks completed successfully.")
+        print("All CoffeeTalk tasks completed successfully.")
     except ValueError as e:
         print(str(e))
     except Exception as e:
