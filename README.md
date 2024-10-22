@@ -22,13 +22,9 @@ CoffeeTalk can be used by developers to enhance code understanding, automate cod
    ```
 4. **Run the script:**
 
-   If `TARGET_REPO_PATH` is not set, you will be prompted for it at each invocation:
+   Note: If `TARGET_REPO_PATH` is not set, you will be prompted. Set it via an environment variable or pass it as a command-line argument, e.g., `TARGET_REPO_PATH="/path/to/repo" python src/main.py`.
    ```
    python src/main.py
-   ```
-   **or:** (for example)
-   ```
-   TARGET_REPO_PATH="/path/to/your/target/repo" python src/main.py
    ```
 5. **Deactivate the virtual environment:**
    ```
@@ -42,19 +38,21 @@ graph TD
     Start[Target Code / Repository] --> CoffeeTalk
 
     subgraph CoffeeTalk["CoffeeTalk ☕"]
-        LD[Language Detection] --> CSE
+        LD[Language Detection] --> ECS
 
-        PTM_1[Pre-trained Model] --> Inference
-        CSE[Code Snippet Extraction] --> Inference
-        HP_1[Hardware Profile] --> Inference
+        ECS{{Extract Code Snippets}} --> CS
 
-        Inference{Inference} --> TD
+        PTM_1[Pre-trained Model] --> GenerateTD
+        CS[Code Snippets] --> GenerateTD
+        HP_1[Hardware Profile] --> GenerateTD
 
-        PTM_2[Pre-trained Model] --> Training
-        TD[Training Data] --> Training
-        HP_2[Hardware Profile] --> Training
+        GenerateTD{{Generate Training Data}} --> TD
 
-        Training{Training} --> FTM
+        PTM_2[Pre-trained Model] --> TrainData
+        TD[Training Data] --> TrainData
+        HP_2[Hardware Profile] --> TrainData
+
+        TrainData{{Train Data}} --> FTM
     end
 
     FTM[Fine-tuned Model] --> End[Inference by User/AI]
