@@ -1,10 +1,7 @@
 import os
 import json
 import logging
-import languages.javascript as javascript
-import languages.typescript as typescript
-import languages.python as python
-import languages.go as go
+from languages import javascript, typescript, python, go
 from dotenv import load_dotenv
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 import torch
