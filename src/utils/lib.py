@@ -1,8 +1,8 @@
 import os
 import torch
 import logging
-from utils.hardware_profiles import profiles  # Updated relative import
-from utils.constants import DEFAULT_HARDWARE_PROFILE
+from .hardware_profiles import profiles
+from .constants import DEFAULT_HARDWARE_PROFILE
 
 
 def get_hardware_profile():

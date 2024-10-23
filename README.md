@@ -72,4 +72,28 @@ CoffeeTalk supports different hardware profiles to optimize training for various
 
 You can choose the model to use for training by setting the `TRAINING_MODEL` environment variable. If not set, the script defaults to `distilgpt2`, which is a highly memory-efficient model.
 
+## Testing
+
+CoffeeTalk uses pytest for testing. After installing the dependencies, you can run tests using any of these commands:
+
+1. **Run all tests:**
+   ```
+   pytest
+   ```
+2. **Run with verbose output:**
+   ```
+   pytest -v
+   ```
+3. **Run with coverage report:**
+   ```
+   pytest --cov=src
+   ```
+4. **Run a specific test file:**
+   ```
+   pytest tests/test_language_extractors.py
+   ```
+
 ## TODO
+
+- Add more tests
+- Specify versions in requirements.txt
