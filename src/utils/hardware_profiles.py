@@ -4,6 +4,7 @@ This module defines hardware profiles for different computing environments.
 
 from dataclasses import dataclass, field
 from typing import Dict
+import logging
 import torch
 
 
@@ -37,30 +38,33 @@ class HardwareProfile:
     def get_device(self):
         """Determine the appropriate device based on the hardware profile settings."""
         if self.use_cpu:
+            logging.debug("Using CPU device")
             return torch.device("cpu")
         elif self.use_mps_device and torch.backends.mps.is_available():
+            logging.debug("Using MPS device")
             return torch.device("mps")
         elif torch.cuda.is_available():
+            logging.debug("Using CUDA device")
             return torch.device("cuda")
         else:
-            # Fallback to CPU if no other options are available
+            logging.warning("No GPU device available, falling back to CPU")
             return torch.device("cpu")
 
     def display_settings(self):
-        print("Hardware Profile Settings:")
-        print(f"Gradient Accumulation Steps: {self.gradient_accumulation_steps}")
-        print(f"Learning Rate: {self.learning_rate}")
-        print(f"Max Length: {self.max_length}")
-        print(f"Number of Train Epochs: {self.num_train_epochs}")
-        print(f"Per Device Train Batch Size: {self.per_device_train_batch_size}")
-        print(f"Weight Decay: {self.weight_decay}")
-        print(f"FP16: {self.fp16}")
-        print(f"Use CPU: {self.use_cpu}")
-        print(f"Use MPS Device: {self.use_mps_device}")
-        print(f"Environment Variables: {self.env_vars}")
-        print(f"Tokenizers Parallelism: {self.tokenizers_parallelism}")
-        print(f"PyTorch Num Interop Threads: {self.torch_num_interop_threads}")
-        print(f"PyTorch Num Threads: {self.torch_num_threads}")
+        logging.debug("Hardware Profile Settings:")
+        logging.debug(f"Gradient Accumulation Steps: {self.gradient_accumulation_steps}")
+        logging.debug(f"Learning Rate: {self.learning_rate}")
+        logging.debug(f"Max Length: {self.max_length}")
+        logging.debug(f"Number of Train Epochs: {self.num_train_epochs}")
+        logging.debug(f"Per Device Train Batch Size: {self.per_device_train_batch_size}")
+        logging.debug(f"Weight Decay: {self.weight_decay}")
+        logging.debug(f"FP16: {self.fp16}")
+        logging.debug(f"Use CPU: {self.use_cpu}")
+        logging.debug(f"Use MPS Device: {self.use_mps_device}")
+        logging.debug(f"Environment Variables: {self.env_vars}")
+        logging.debug(f"Tokenizers Parallelism: {self.tokenizers_parallelism}")
+        logging.debug(f"PyTorch Num Interop Threads: {self.torch_num_interop_threads}")
+        logging.debug(f"PyTorch Num Threads: {self.torch_num_threads}")
 
 
 apple_silicon = HardwareProfile(

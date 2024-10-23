@@ -75,4 +75,4 @@ You can choose the model to use for training by setting the `TRAINING_MODEL` env
 
 ## TODO
 
-- Add verbose option for output (per snippet trained, etc)
+- Make fallback for hardware_profile_name a constant

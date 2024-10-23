@@ -1,4 +1,5 @@
-import os
+import argparse
+import logging
 from generate_training_data import main as generate_training_data
 from train_model import main as train_model
 from utils import (
@@ -6,11 +7,18 @@ from utils import (
     get_target_repo_path,
     setup_hardware_environment
 )
+from utils.logging_config import setup_logging
 
 
 def main():
+    parser = argparse.ArgumentParser(description='CoffeeTalk: Code Analysis Tool')
+    parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose output')
+    args = parser.parse_args()
+
+    setup_logging(args.verbose)
+
     try:
-        print("Starting CoffeeTalk...")
+        logging.info("Starting CoffeeTalk...")
 
         target_repo_path = get_target_repo_path()
         hardware_profile = get_hardware_profile()
@@ -19,11 +27,11 @@ def main():
         generate_training_data(target_repo_path, hardware_profile)
         train_model(target_repo_path, hardware_profile)
 
-        print("All CoffeeTalk tasks completed successfully.")
+        logging.info("All CoffeeTalk tasks completed successfully")
     except ValueError as e:
-        print(str(e))
+        logging.error(str(e))
     except Exception as e:
-        print(f"An error occurred: {str(e)}")
+        logging.error(f"An error occurred: {str(e)}")
 
 
 if __name__ == "__main__":
