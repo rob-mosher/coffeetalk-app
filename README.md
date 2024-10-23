@@ -72,7 +72,4 @@ CoffeeTalk supports different hardware profiles to optimize training for various
 
 You can choose the model to use for training by setting the `TRAINING_MODEL` environment variable. If not set, the script defaults to `distilgpt2`, which is a highly memory-efficient model.
 
-
 ## TODO
-
-- Make fallback for hardware_profile_name a constant

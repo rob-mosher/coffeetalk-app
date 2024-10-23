@@ -2,16 +2,16 @@ import os
 import torch
 import logging
 from utils.hardware_profiles import profiles  # Updated relative import
+from utils.constants import DEFAULT_HARDWARE_PROFILE
 
 
 def get_hardware_profile():
     logging.info("Getting hardware profile...")
 
-    hardware_profile_name = os.getenv('HARDWARE_PROFILE', 'apple_silicon')
+    hardware_profile_name = os.getenv('HARDWARE_PROFILE', DEFAULT_HARDWARE_PROFILE)
     if hardware_profile_name not in profiles:
-        logging.warning(f"Invalid hardware profile: {
-                        hardware_profile_name}, using default (apple_silicon)")
-        hardware_profile_name = 'apple_silicon'
+        logging.warning(f"Invalid hardware profile: {hardware_profile_name}, using default ({DEFAULT_HARDWARE_PROFILE})")
+        hardware_profile_name = DEFAULT_HARDWARE_PROFILE
 
     hardware_profile = profiles[hardware_profile_name]
     logging.info(f"Using hardware profile: {hardware_profile_name}")

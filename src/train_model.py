@@ -10,6 +10,7 @@ from transformers import (
     TrainingArguments
 )
 from utils.hardware_profiles import HardwareProfile
+from utils.constants import DEFAULT_MODEL_NAME
 
 
 def load_dataset_from_json(json_path):
@@ -104,7 +105,7 @@ def main(target_repo_path: str, hardware_profile: HardwareProfile):
     json_path = os.path.join('data', 'training_data.json')
     dataset = load_dataset_from_json(json_path)
 
-    model_name = os.getenv('TRAINING_MODEL', 'distilgpt2')
+    model_name = os.getenv('TRAINING_MODEL', DEFAULT_MODEL_NAME)
     logging.info(f"Using model: {model_name}")
 
     output_dir = os.path.join(target_repo_path, "results")

@@ -8,6 +8,7 @@ import languages.go as go
 from dotenv import load_dotenv
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 import torch
+from utils.constants import DEFAULT_MODEL_NAME
 
 load_dotenv()
 
@@ -66,15 +67,15 @@ def create_training_data(snippets, hardware_profile):
     training_data = []
 
     # Load the model and tokenizer
-    model = GPT2LMHeadModel.from_pretrained("distilgpt2")
-    tokenizer = GPT2Tokenizer.from_pretrained("distilgpt2")
+    model = GPT2LMHeadModel.from_pretrained(DEFAULT_MODEL_NAME)
+    tokenizer = GPT2Tokenizer.from_pretrained(DEFAULT_MODEL_NAME)
 
     # Configure the tokenizer
     tokenizer.pad_token = tokenizer.eos_token  # Ensure pad_token is set
     model.config.pad_token_id = model.config.eos_token_id
 
     logging.debug("Model Settings:")
-    logging.debug(f"Model Name: distilgpt2")
+    logging.debug(f"Model Name: {DEFAULT_MODEL_NAME}")
     logging.debug(f"Pad Token ID: {model.config.pad_token_id}")
 
     device = hardware_profile.get_device()
