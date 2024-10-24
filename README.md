@@ -102,3 +102,5 @@ CoffeeTalk uses pytest for testing. After installing the dependencies, you can r
 
 - Add more tests
 - Specify versions in requirements.txt
+
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
