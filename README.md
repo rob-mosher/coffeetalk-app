@@ -26,6 +26,11 @@ CoffeeTalk can be used by developers to enhance code understanding, automate cod
    ```
    python src/main.py
    ```
+
+   For verbose output:
+   ```
+   python src/main.py -v
+   ```
 5. **Deactivate the virtual environment:**
    ```
    deactivate
